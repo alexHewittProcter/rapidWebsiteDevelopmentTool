@@ -1,11 +1,11 @@
 <?php
-    require('Category.php');
-    require('Element.php');
-    require('Functions.php');
-    require('Image.php');
-    require('ListingType.php');
-    require('ListingWebsite.php');
-    require('User.php');
-    require('WebGroup.php');
-    require('Website.php');
+    include('Functions.php');
+    include('WebGroup.php');
+    include('Website.php');
+    include('Category.php');
+    include('Element.php');
+    include('Image.php');
+    include('ListingType.php');
+    include('ListingWebsite.php');
+    include('User.php');
 ?>

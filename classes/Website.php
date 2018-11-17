@@ -469,15 +469,21 @@ class Website extends Functions
         foreach($this->loginElements as $value) {
             array_push($newArray,$value);
         }
-        foreach($formType->getFormElements() as $value) {
-            array_push($newArray,$value);
+        //print_r($newArray);
+        if($formType != null) {
+            foreach($formType->getFormElements() as $value) {
+                array_push($newArray,$value);
+            }
         }
+        //print_r($newArray);
         foreach($this->defaultUserElements as $value) {
             array_push($newArray,$value);
         }
+        //print_r($newArray);
         foreach($this->nonPrintables as $value) {
             array_push($newArray,$value);
         }
+        //print_r($newArray);
         return $newArray;
     }
 
@@ -542,6 +548,8 @@ class Website extends Functions
             case "Sign up" :
                 if(isset($_GET['type'])) {
                     $user = $this->getByType($this->users,$_GET['type']);
+                } else if(count($this->users) < 2) {
+                    $user = $this->getByType($this->users,0);
                 }
                 if(isset($_POST['submit'])) {
                     $formElements = $this->getUserFormElements($user);
@@ -595,7 +603,16 @@ class Website extends Functions
                 $this->setCurrentURL('signUp.php');
                 $this->printHeader();
                 echo "<div class='container'>";
-                if(isset($_GET['type'])) {
+                if(count($this->users) < 2) {
+                    $this->printPageHeader('Sign up');
+                    $array = $this->getUserFormElements($user);
+                    if($user != null) {
+                        $hidden = $user->getRegisterElements();
+                    } else {
+                        $hidden = [];
+                    }
+                    $this->printForm($array,$_POST,"POST",$hidden);
+                } else if(isset($_GET['type'])) {
                     $this->printPageHeader($user->getName() . " sign up");
                     $array = $this->getUserFormElements($user);
                     $hidden = $user->getRegisterElements();

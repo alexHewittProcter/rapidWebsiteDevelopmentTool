@@ -276,6 +276,8 @@ class Website extends Functions
                     }
                   ?>
               </ul>
+              <?php if(count($this->loginElements) == 0) {
+                  ?>
               <ul class="nav navbar-nav navbar-right">
                   <?php
                     
@@ -310,6 +312,9 @@ class Website extends Functions
                     }
                   ?>
               </ul>
+              <?php
+              }
+              ?>
             </div><!--/.nav-collapse -->
           </div>
         </nav>

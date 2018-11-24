@@ -1,4 +1,4 @@
- <?php
+<?php
 
     /**
      * WebGroup Class

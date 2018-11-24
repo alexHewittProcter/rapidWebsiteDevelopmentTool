@@ -276,7 +276,8 @@ class Website extends Functions
                     }
                   ?>
               </ul>
-              <?php if(count($this->loginElements) == 0) {
+              <?php 
+              if(count($this->loginElements) > 0) {
                   ?>
               <ul class="nav navbar-nav navbar-right">
                   <?php
@@ -519,7 +520,7 @@ class Website extends Functions
      * @return Null
      */
     public function addDefaultImage($image) {
-        $this->userDefaultImages[] = $image;
+        $this->defaultUserImages[] = $image;
     }
 
     /**
@@ -564,13 +565,20 @@ class Website extends Functions
                         $link = $this->getConnection();
                         $result = mysqli_query($link,$query) or die("Failed to query databse".$query);
                         $this->logInUser($_POST);
-                        if(count(array_merge($this->userDefaultImages,$user->getUserImages())) > 0) {
+                        $imageCount = count($this->defaultUserImages);
+                        if($user != null) {
+                            $imageCount = count($user->getUserImages());
+                        }
+                        if($imageCount > 0) {
                             header("Location:signUpUploadImage.php");
                         } else if($this->membershipFeeStructure == true) {
                             header("Location:MembershipFee.php?from=signUp");
                         } else {
-                            header("Location:".$this->passSignUpURL);
+                            header("Location:passSignUp.php");
+                            echo "Location:".$this->passSignUpURL;
+                            exit();
                         }
+                        echo "Here";
                     } else {
                         
                     }
@@ -947,8 +955,12 @@ class Website extends Functions
      * @return null
      */
     public function userLoggedIn() {
-        $email = $_SESSION['userEmail'];
-        $string = $_SESSION['userString'];
+        if(!empty($_SESSION['userEmail'])) {
+            $email = $_SESSION['userEmail'];
+        }
+        if(!empty($_SESSION['userString'])) {
+            $string = $_SESSION['userString'];
+        }
         $query = "SELECT * FROM users WHERE userEmail='$email' AND userString='$string'";
         if(empty($this->dbc)) {
             $this->createConnection();

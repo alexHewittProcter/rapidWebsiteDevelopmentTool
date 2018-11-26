@@ -177,6 +177,11 @@ class Website extends Functions
      */
     private $loggedInNameActionSet = false;
 
+
+    /**
+     * This holds the sets of different key and value pairs for redirecting URL's
+     */
+    private $redirectURLS = array();
     /**
      * Constructor
      * 
@@ -1043,8 +1048,34 @@ class Website extends Functions
         }*/
     }
     
+    /**
+     * Returns the action for getting the logged in name action
+     * @return Function
+     */
     public function getLoggedInNameAction() {
         return $this->loggedInNameAction;
+    }
+
+    /**
+     * Adds a redirect key and value pair to the redirect array
+     */
+    public function addRedirectURL($key,$value) {
+        $this->redirectURLS[$key] = $value;
+    }
+
+    /**
+     * Searches through the redirect array to see if any match the $_GET['redirect'] value
+     */
+    public function redirect($finalURL) {
+        if(!empty($_GET['redirect'])) {
+            if($this->redirectURLS[$_GET['redirect']] != NULL) {
+                header("Location:".$this->redirectURLS[$_GET['redirect']]);
+            } else {
+                header("Location:".$finalURL);
+            }
+        } else {
+            header("Location:".$finalURL);
+        }
     }
 }
 ?>

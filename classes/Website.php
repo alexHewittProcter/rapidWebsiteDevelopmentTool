@@ -153,6 +153,30 @@ class Website extends Functions
      */
     private $formErrors = array();
 
+
+    /**
+     * Logged in drop down items
+     */
+
+    /**
+     * Logged in drop down sections holds the 3d arrays of all the different sections then LoggedInDropDown elements
+     * 
+     * @var Array[Array[LoggedInDropDown]]
+     */
+    private $loggedInDropDownSections = array();
+    
+    /**
+     * Logged in name holds the action that gets the name when a user is logged in
+     * 
+     * @var function
+     */
+    public $loggedInNameAction;
+
+    /**
+     * The flag to determine if the loggedInNameAction has been set
+     */
+    private $loggedInNameActionSet = false;
+
     /**
      * Constructor
      * 
@@ -281,29 +305,33 @@ class Website extends Functions
                   ?>
               <ul class="nav navbar-nav navbar-right">
                   <?php
-                    
                     if($this->loggedIn) {
-                        $names = $this->currentUserObj->getNameElements();
-                        echo '<li class="dropdown">';
-                        echo '<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">'  . $this->userData['userFirstName'] . '<span class="caret"></span></a>';
-                        echo '<ul class="dropdown-menu">';
-                        switch($this->currentUserObj->getType()) {
-                            case 0 :
-                                echo '<li><a href="savedlistings.php">Saved Listings</a></li>';
-                                break;
-                            case 1 :
-                                echo '<li><a href="admin.php">Admin</a></li>';
-                                break;
-                            case 2 :
-                                echo '<li><a href="admin.php">Admin</a></li>';
-                                break;
-                            case 3 :
-                                echo '<li><a href="admin.php">Site Admin</a></li>';
-                                break;
+                        if($this->currentUserObj != null) {
+                            $names = $this->currentUserObj->getNameElements();
+                            $type = $this->currentUserObj->getType();
+                        } else {
+                            $type = $this->userData['userType'];
                         }
-    
+                        if($this->loggedInNameActionSet) {
+                            $nameFunction = $this->getLoggedInNameAction();
+                            $name = $nameFunction($this->userData);
+                        } else {
+                            $name = $this->userData['userFirstName']; 
+                        }
+                        echo '<li class="dropdown">';
+                        echo '<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">'  . $name . '<span class="caret"></span></a>';
+                        echo '<ul class="dropdown-menu">';
+                        for($i =0; $i < count($this->loggedInDropDownSections);$i++) {
+                            for($j = 0; $j < count($this->loggedInDropDownSections[$i]); $j++) {
+                                if($this->loggedInDropDownSections[$i][$j]->conditionMet($type)) {
+                                        echo '<li><a href="'.$this->loggedInDropDownSections[$i][$j]->link.'">'.$this->loggedInDropDownSections[$i][$j]->title.'</a></li>';
+                                }
+                            }
+                            if(count($this->loggedInDropDownSections) - 1 > $i) {
+                                echo '<li role="separator" class="divider"></li>';
+                            }
+                        }
                         echo '<li role="separator" class="divider"></li>';
-                        echo '<li><a href="settings.php">Settings</a></li>';
                         echo '<li><a href="logout.php">Logout</a></li>';
                         echo '</ul>';
                         echo '</li>';
@@ -552,6 +580,9 @@ class Website extends Functions
         //Before header
         switch($pageName) {
             case "Sign up" :
+                if($this->loggedIn) {
+                    header("Location:".$this->passSignUpURL);
+                }
                 if(isset($_GET['type'])) {
                     $user = $this->getByType($this->users,$_GET['type']);
                 } else if(count($this->users) < 2) {
@@ -574,9 +605,7 @@ class Website extends Functions
                         } else if($this->membershipFeeStructure == true) {
                             header("Location:MembershipFee.php?from=signUp");
                         } else {
-                            header("Location:passSignUp.php");
-                            echo "Location:".$this->passSignUpURL;
-                            exit();
+                            header("Location:".$this->passSignUpURL);
                         }
                         echo "Here";
                     } else {
@@ -975,6 +1004,47 @@ class Website extends Functions
         } else {
             $this->loggedIn = false;
         }
+    }
+    
+    /**
+     * Adds a an array of logged in dropped down elements to the array
+     * 
+     * @var Array[LoggedInDropDown] $section
+     * 
+     * @return null
+     */
+    public function addLoggedInDropDownSection($section) {
+        $this->loggedInDropDownSections[] = $section;
+
+    }
+
+
+    /**
+     * Sets the function for the loggedInNameFunction
+     * 
+     * If the function parameter is null then it unsets the function variable
+     * 
+     * @param function $function
+     * 
+     * @return null
+     */
+    public function setLoggedInNameAction($function) {
+        $this->loggedInNameAction = $function;
+        $this->loggedInNameActionSet = true;
+        //$this->loggedInNameAction(["userFirstName"=>"BOB"]);
+        /*
+        if($function != null) {
+            echo "YES";
+           
+        } else {
+            echo "NO";
+            $this->loggedInNameAction = null;
+            $this->loggedInNameActionSet = false;
+        }*/
+    }
+    
+    public function getLoggedInNameAction() {
+        return $this->loggedInNameAction;
     }
 }
 ?>

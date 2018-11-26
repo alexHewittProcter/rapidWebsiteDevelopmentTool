@@ -67,6 +67,19 @@ class Functions
           return $tempPass;
     }
 
+
+    /**
+     * Generates a random string between 15 and 255 characters that are non escapable characters
+     */
+    public function randomAlphaString() {
+        $charArray = str_split("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+            $tempPass = ""; 
+            for($i=0;$i<rand(15,255);$i++){
+                $tempPass .= $charArray[rand(0,count($charArray) - 1)];
+            }
+            return $tempPass;
+    }
+
     /**
      * Validates a password based on regex and other factors
      * 
